@@ -24,4 +24,4 @@ The Attendance Tracker System is a web application designed to help educational 
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/yourusername/attendance-tracker.git
+   git clone [https://github.com/yourusername/attendance-tracker.git](https://github.com/KaluarachchiVI/attendance.git)
