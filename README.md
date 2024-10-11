@@ -50,7 +50,7 @@ Setup Instructions
 step 1:
 
 # Clone repository
-git clone [<repository-url>](https://github.com/KaluarachchiVI/attendance.git)
+git clone : https://github.com/KaluarachchiVI/attendance.git
 
 # Install dependencies
 composer install
