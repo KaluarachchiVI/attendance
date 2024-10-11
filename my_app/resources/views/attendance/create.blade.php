@@ -4,9 +4,50 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mark Attendance</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            color: #333;
+        }
+        a {
+            text-decoration: none;
+            color: #007BFF;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        select, input[type="text"], input[type="date"], button {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+            border: none;
+        }
+        button:hover {
+            background-color: #0056b3; /* Darker shade on hover */
+        }
+        .student-row {
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 <body>
     <h1>Mark Attendance</h1>
+
+    <a href="{{ route('attendance.index') }}">Back to Attendance List</a> <!-- Back button -->
 
     <form action="{{ route('attendance.store') }}" method="POST">
         @csrf
