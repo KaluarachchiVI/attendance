@@ -9,14 +9,13 @@ class CreateAttendancesTable extends Migration
     public function up()
     {
         Schema::create('attendances', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('student_id')->constrained()->onDelete('cascade');
-            $table->foreignId('subject_id')->constrained()->onDelete('cascade');
-            $table->string('status');
-            $table->date('date');
-            $table->timestamps();
+            $table->id(); // Optional, if you want to keep track of each attendance record
+            $table->string('student_name'); // Store student name
+            $table->string('subject_name'); // Store subject name
+            $table->string('status'); // Attendance status (present/absent)
+            $table->date('date'); // Date of attendance
+            $table->timestamps(); // Created at and updated at
         });
-        
     }
 
     public function down()
@@ -24,3 +23,4 @@ class CreateAttendancesTable extends Migration
         Schema::dropIfExists('attendances');
     }
 }
+
