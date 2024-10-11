@@ -10,28 +10,49 @@ use Illuminate\Http\Request;
 class AttendanceController extends Controller
 {
     public function index(Request $request)
-    {
-        $query = Attendance::with(['student', 'subject']);
-    
-        // Filter by date range if provided
-        if ($request->filled('date_from') && $request->filled('date_to')) {
-            $query->whereBetween('created_at', [$request->date_from, $request->date_to]);
-        }
-    
-        // Filter by subject if provided
-        if ($request->filled('subject_id')) {
-            $query->where('subject_id', $request->subject_id);
-        }
-    
-        // Get attendance records and paginate
-        $attendances = $query->paginate(10); // Renamed variable to 'attendances'
-    
-        // Fetch all subjects for the filter dropdown
-        $subjects = Subject::all();
-    
-        // Return the view with attendances and subjects
-        return view('attendance.index', compact('attendances', 'subjects')); // Pass 'attendances' to the view
+{
+    $query = Attendance::query();
+
+    // Filter by subject if provided
+    if ($request->filled('subject_name')) {
+        $query->where('subject_name', $request->subject_name);
     }
+
+    // Filter by date range if provided
+    if ($request->filled('date_from') && $request->filled('date_to')) {
+        $query->whereBetween('date', [$request->date_from, $request->date_to]);
+    }
+
+    // Get attendance records with pagination
+    $attendances = $query->paginate(10);
+
+    // Get distinct subjects for the filter dropdown
+    $subjects = Attendance::select('subject_name')->distinct()->get();
+
+    // Calculate attendance percentage for each student
+    $attendanceData = [];
+    foreach ($attendances as $attendance) {
+        if (!isset($attendanceData[$attendance->student_name])) {
+            $attendanceData[$attendance->student_name] = [
+                'total' => 0,
+                'present' => 0,
+                'subject_name' => $attendance->subject_name // Assuming the same subject for all records
+            ];
+        }
+        $attendanceData[$attendance->student_name]['total']++;
+        if ($attendance->status === 'present') {
+            $attendanceData[$attendance->student_name]['present']++;
+        }
+    }
+
+    // Calculate percentage for each student
+    foreach ($attendanceData as $studentName => $data) {
+        $attendanceData[$studentName]['percentage'] = $data['total'] > 0 ? ($data['present'] / $data['total']) * 100 : 0;
+    }
+
+    return view('attendance.index', compact('attendances', 'subjects', 'attendanceData'));
+}
+
     
 
 
@@ -62,22 +83,27 @@ public function store(Request $request)
 {
     // Validate the incoming request
     $request->validate([
-        'student_name' => 'required|string',
-        'subject_name' => 'required|string',
-        'status' => 'required|string',
-        'date' => 'required|date',
+        'subject_id' => 'required|exists:subjects,id', // Ensure the subject ID is valid
+        'attendance' => 'required|array', // Ensure attendance data is provided
     ]);
 
-    // Create a new attendance record
-    Attendance::create([
-        'student_name' => $request->student_name,
-        'subject_name' => $request->subject_name,
-        'status' => $request->status,
-        'date' => $request->date,
-    ]);
+    // Fetch the subject name based on the selected ID
+    $subject = Subject::findOrFail($request->subject_id);
 
-    return redirect()->route('attendance.index')->with('success', 'Attendance marked successfully');
+    // Loop through each student's attendance status and save
+    foreach ($request->attendance as $studentId => $status) {
+        Attendance::create([
+            'student_name' => Student::findOrFail($studentId)->name, // Fetch student name based on ID
+            'subject_name' => $subject->name, // Store the subject name directly
+            'status' => $status === 'present' ? 'present' : 'absent', // Determine attendance status
+            'date' => now()->toDateString(), // Store today's date
+        ]);
+    }
+
+    return redirect()->route('attendance.index')->with('success', 'Attendance marked successfully!');
 }
+
+
 
     
 
