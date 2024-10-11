@@ -58,23 +58,27 @@ public function fetchStudents($subjectId)
 }
 
 
-    // Store attendance records
-    public function store(Request $request)
+public function store(Request $request)
 {
-    $subjectId = $request->input('subject_id');
-    $attendances = $request->input('attendance', []);
+    // Validate the incoming request
+    $request->validate([
+        'student_name' => 'required|string',
+        'subject_name' => 'required|string',
+        'status' => 'required|string',
+        'date' => 'required|date',
+    ]);
 
-    // Loop through all students' attendance and store it in the database
-    foreach ($attendances as $studentId => $status) {
-        Attendance::create([
-            'student_id' => $studentId,
-            'subject_id' => $subjectId,
-            'status' => $status,
-            'date' => now(),
-        ]);
-    }
+    // Create a new attendance record
+    Attendance::create([
+        'student_name' => $request->student_name,
+        'subject_name' => $request->subject_name,
+        'status' => $request->status,
+        'date' => $request->date,
+    ]);
 
     return redirect()->route('attendance.index')->with('success', 'Attendance marked successfully');
 }
+
+    
 
 }

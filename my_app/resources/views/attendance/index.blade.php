@@ -9,25 +9,26 @@
     <h1>Attendance List</h1>
     <a href="{{ route('attendance.create') }}">Add Attendance</a>
     <table>
-        <thead>
+    <thead>
+        <tr>
+            <th>Student Name</th>
+            <th>Subject Name</th>
+            <th>Date</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach($attendances as $attendance)
             <tr>
-                <th>Student</th>
-                <th>Subject</th>
-                <th>Date</th>
-                <th>Attended</th>
+                <td>{{ $attendance->student_name }}</td>
+                <td>{{ $attendance->subject_name }}</td>
+                <td>{{ $attendance->date }}</td>
+                <td>{{ $attendance->status }}</td>
             </tr>
-        </thead>
-        <tbody>
-            @foreach ($attendances as $attendance)
-                <tr>
-                    <td>{{ $attendance->student->name }}</td>
-                    <td>{{ $attendance->subject->name }}</td>
-                    <td>{{ $attendance->date }}</td>
-                    <td>{{ $attendance->attended ? 'Yes' : 'No' }}</td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
+        @endforeach
+    </tbody>
+</table>
+
 
     {{ $attendances->links() }} <!-- Pagination links -->
 </body>
